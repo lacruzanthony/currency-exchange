@@ -1,5 +1,5 @@
 {
   "ext": "ts",
   "ignore": ["app/**/*.test.ts"],
-  "exec": "ts-node --transpile-only --project ./tsconfig.json ./index.ts"
+  "exec": "ts-node --transpile-only --project ./tsconfig.json ./app/index.ts"
 }
