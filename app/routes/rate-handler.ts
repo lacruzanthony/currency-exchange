@@ -10,13 +10,9 @@ router.get(
   "/rate",
   [
     body("from").not().isEmpty().withMessage("'from' parameter is required"),
-    body("from")
-      .custom(isValidCurrency)
-      .withMessage("Currency from is not supported"),
+    body("from").custom(isValidCurrency),
     body("to").not().isEmpty().withMessage("'to' parameter is required"),
-    body("to")
-      .custom(isValidCurrency)
-      .withMessage("Currency to is not supported"),
+    body("to").custom(isValidCurrency),
   ],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -27,4 +23,4 @@ router.get(
   }
 );
 
-export { router as getRateRoute };
+export { router as getRateRouter };
