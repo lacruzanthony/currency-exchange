@@ -8,54 +8,69 @@ describe("getRateRoute", () => {
     it("should returns current rate", async () => {
       mocked(fetchRate).mockResolvedValue({ rate: 1.25 });
 
-      const response = await request(app)
+      const { body } = await request(app)
         .get("/rate")
         .send({ from: "EUR", to: "USD" })
         .expect(200);
 
-      console.log(response);
-
-      // expect(body).toEqual({ rate: 1.25 });
+      expect(body).toEqual({ rate: 1.25 });
     }, 9000);
   });
 
-  describe.skip("when request is invalid", () => {
+  describe("when request is invalid", () => {
     test("returns Bad Request when 'to' parameter is missing", async () => {
       const { body } = await request(app)
         .get("/rate")
         .send({ from: "EUR" })
         .expect(400);
-      console.log(body, "---------------------body------------------------");
-      // expect(res._getData()).toEqual({
-      //   errors: ["'to' parameter is required"],
-      // });
-      // expect(fetchRate).not.toBeCalled();
+
+      expect(body).toEqual({
+        errors: [{ message: "'to' parameter is required", field: "to" }],
+      });
+      expect(fetchRate).not.toBeCalled();
     }, 9000);
-    // test("returns Bad Request when 'from' parameter is missing", async () => {
-    //   const req = httpMocks.createRequest({
-    //     query: { to: "CAD" },
-    //   });
-    //   const res = httpMocks.createResponse({});
-    //   const next = jest.fn();
-    //   await getRateRoute(req, res, next);
-    //   expect(res.statusCode).toBe(400);
-    //   expect(res._getData()).toEqual({
-    //     errors: ["'from' parameter is required"],
-    //   });
-    //   expect(fetchRate).not.toBeCalled();
-    // });
-    // test("returns Bad Request when both parameters are missing", async () => {
-    //   const req = httpMocks.createRequest({
-    //     query: { from: "", to: "" },
-    //   });
-    //   const res = httpMocks.createResponse({});
-    //   const next = jest.fn();
-    //   await getRateRoute(req, res, next);
-    //   expect(res.statusCode).toBe(400);
-    //   expect(res._getData()).toEqual({
-    //     errors: ["'from' parameter is required", "'to' parameter is required"],
-    //   });
-    //   expect(fetchRate).not.toBeCalled();
-    // });
+    test("returns Bad Request when 'from' parameter is missing", async () => {
+      const { body } = await request(app)
+        .get("/rate")
+        .send({ to: "EUR" })
+        .expect(400);
+
+      expect(body).toEqual({
+        errors: [{ message: "'from' parameter is required", field: "from" }],
+      });
+      expect(fetchRate).not.toBeCalled();
+    });
+    test("returns Bad Request when both parameters are missing", async () => {
+      const { body } = await request(app).get("/rate").send({}).expect(400);
+
+      expect(body).toEqual({
+        errors: [
+          { message: "'from' parameter is required", field: "from" },
+          { message: "'to' parameter is required", field: "to" },
+        ],
+      });
+      expect(fetchRate).not.toBeCalled();
+    });
+
+    test.skip("returns Bad Request when both parameters are not supported", async () => {
+      const { body } = await request(app)
+        .get("/rate")
+        .send({ from: "TATA", to: "AAAA" })
+        .expect(400);
+
+      expect(body).toEqual({
+        errors: [
+          {
+            message: "Currency TATA is not supported",
+            field: "from",
+          },
+          {
+            message: "Currency AAAA is not supported",
+            field: "to",
+          },
+        ],
+      });
+      expect(fetchRate).not.toBeCalled();
+    });
   });
 });
