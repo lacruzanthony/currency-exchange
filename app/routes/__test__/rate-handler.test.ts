@@ -1,11 +1,12 @@
 import { mocked } from "jest-mock";
 import request from "supertest";
 import { app } from "../../app";
-import { fetchRate } from "../../services/api-client";
+import { fetchCurrencies, fetchRate } from "../../services/api-client";
 
 describe("getRateRoute", () => {
   describe("when request is valid", () => {
-    it("should returns current rate", async () => {
+    test("should returns current rate", async () => {
+      mocked(fetchCurrencies).mockResolvedValue(["USD", "EUR", "NZD"]);
       mocked(fetchRate).mockResolvedValue({ rate: 1.25 });
 
       const { body } = await request(app)
@@ -14,11 +15,13 @@ describe("getRateRoute", () => {
         .expect(200);
 
       expect(body).toEqual({ rate: 1.25 });
-    }, 9000);
+    });
   });
 
   describe("when request is invalid", () => {
     test("returns Bad Request when 'to' parameter is missing", async () => {
+      mocked(fetchCurrencies).mockResolvedValue(["USD", "EUR", "NZD"]);
+
       const { body } = await request(app)
         .get("/rate")
         .send({ from: "EUR" })
@@ -28,8 +31,10 @@ describe("getRateRoute", () => {
         errors: [{ message: "'to' parameter is required", field: "to" }],
       });
       expect(fetchRate).not.toBeCalled();
-    }, 9000);
+    });
+
     test("returns Bad Request when 'from' parameter is missing", async () => {
+      mocked(fetchCurrencies).mockResolvedValue(["USD", "EUR", "NZD"]);
       const { body } = await request(app)
         .get("/rate")
         .send({ to: "EUR" })
@@ -40,7 +45,9 @@ describe("getRateRoute", () => {
       });
       expect(fetchRate).not.toBeCalled();
     });
+
     test("returns Bad Request when both parameters are missing", async () => {
+      mocked(fetchCurrencies).mockResolvedValue(["USD", "EUR", "NZD"]);
       const { body } = await request(app).get("/rate").send({}).expect(400);
 
       expect(body).toEqual({
@@ -52,7 +59,9 @@ describe("getRateRoute", () => {
       expect(fetchRate).not.toBeCalled();
     });
 
-    test.skip("returns Bad Request when both parameters are not supported", async () => {
+    test("returns Bad Request when both parameters are not supported", async () => {
+      mocked(fetchCurrencies).mockResolvedValue(["USD", "EUR", "NZD"]);
+
       const { body } = await request(app)
         .get("/rate")
         .send({ from: "TATA", to: "AAAA" })
