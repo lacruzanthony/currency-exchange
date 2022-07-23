@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { validateRequest } from "../middlewares/validate-request";
 import isValidCurrency from "../services/valid-currency";
-import { calculateCurrencies } from "../services/calculate-currencie";
+import { calculateCurrencies } from "../services/calculate-currency";
 
 const router = express.Router();
 
