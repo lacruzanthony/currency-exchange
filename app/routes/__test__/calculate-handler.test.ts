@@ -11,6 +11,7 @@ describe("calculate-handler", () => {
 
       const { body } = await request(app)
         .post("/calculate")
+        .set("Cookie", global.signin())
         .send({ amount: 1000, from: "EUR", to: ["USD", "JPY", "GBP"] })
         .expect(200);
 
@@ -22,6 +23,16 @@ describe("calculate-handler", () => {
         ],
       });
     });
+
+    it("should throw Unauthorized error", async () => {
+      mocked(fetchCurrencies).mockResolvedValue(["USD", "JPY", "GBP", "EUR"]);
+      mocked(fetchRate).mockResolvedValue({ rate: 1.25 });
+
+      await request(app)
+        .post("/calculate")
+        .send({ amount: 1000, from: "EUR", to: ["USD", "JPY", "GBP"] })
+        .expect(401);
+    });
   });
 
   describe("invalid requests", () => {
@@ -31,6 +42,7 @@ describe("calculate-handler", () => {
 
       const { body } = await request(app)
         .post("/calculate")
+        .set("Cookie", global.signin())
         .send({ amount: 1000, from: "COL", to: ["USD", "JPY", "GBP"] })
         .expect(400);
 
@@ -45,6 +57,7 @@ describe("calculate-handler", () => {
 
       const { body } = await request(app)
         .post("/calculate")
+        .set("Cookie", global.signin())
         .send({ amount: 1000, from: "EUR", to: ["COL", "JPY", "GBP"] })
         .expect(400);
 
@@ -59,6 +72,7 @@ describe("calculate-handler", () => {
 
       const { body } = await request(app)
         .post("/calculate")
+        .set("Cookie", global.signin())
         .send({ amount: -1, from: "EUR", to: ["USD", "JPY", "GBP"] })
         .expect(400);
 

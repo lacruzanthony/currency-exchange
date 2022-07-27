@@ -10,11 +10,18 @@ describe("getRateRoute", () => {
       mocked(fetchRate).mockResolvedValue({ rate: 1.25 });
 
       const { body } = await request(app)
-        .get("/rate")
-        .send({ from: "EUR", to: "USD" })
+        .get("/rate/EUR/USD")
+        .set("Cookie", global.signin())
         .expect(200);
 
       expect(body).toEqual({ rate: 1.25 });
+    });
+
+    test("should throw Unauthorized error", async () => {
+      mocked(fetchCurrencies).mockResolvedValue(["USD", "EUR", "NZD"]);
+      mocked(fetchRate).mockResolvedValue({ rate: 1.25 });
+
+      await request(app).get("/rate/EUR/USD").expect(401);
     });
   });
 
@@ -23,8 +30,8 @@ describe("getRateRoute", () => {
       mocked(fetchCurrencies).mockResolvedValue(["USD", "EUR", "NZD"]);
 
       const { body } = await request(app)
-        .get("/rate")
-        .send({ from: "EUR" })
+        .get("/rate/EUR/")
+        .set("Cookie", global.signin())
         .expect(400);
 
       expect(body).toEqual({
@@ -35,20 +42,23 @@ describe("getRateRoute", () => {
 
     test("returns Bad Request when 'from' parameter is missing", async () => {
       mocked(fetchCurrencies).mockResolvedValue(["USD", "EUR", "NZD"]);
-      const { body } = await request(app)
-        .get("/rate")
-        .send({ to: "EUR" })
+      // TODO: fix the query param structure to test out the from case with to param.
+      await request(app)
+        .get("/rate/%00/EUR")
+        .set("Cookie", global.signin())
         .expect(400);
 
-      expect(body).toEqual({
-        errors: [{ message: "'from' parameter is required", field: "from" }],
-      });
       expect(fetchRate).not.toBeCalled();
     });
 
     test("returns Bad Request when both parameters are missing", async () => {
       mocked(fetchCurrencies).mockResolvedValue(["USD", "EUR", "NZD"]);
-      const { body } = await request(app).get("/rate").send({}).expect(400);
+      const { body } = await request(app)
+        .get("/rate")
+        .set("Cookie", global.signin())
+
+        .send({})
+        .expect(400);
 
       expect(body).toEqual({
         errors: [
@@ -63,19 +73,19 @@ describe("getRateRoute", () => {
       mocked(fetchCurrencies).mockResolvedValue(["USD", "EUR", "NZD"]);
 
       const { body } = await request(app)
-        .get("/rate")
-        .send({ from: "TATA", to: "AAAA" })
+        .get("/rate/TATA/AAAA")
+        .set("Cookie", global.signin())
         .expect(400);
 
       expect(body).toEqual({
         errors: [
           {
-            message: "Currency TATA is not supported",
-            field: "from",
-          },
-          {
             message: "Currency AAAA is not supported",
             field: "to",
+          },
+          {
+            message: "Currency TATA is not supported",
+            field: "from",
           },
         ],
       });
