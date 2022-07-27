@@ -1,24 +1,30 @@
 import { fetchRate } from "../services/api-client";
-import { body } from "express-validator";
+import { param } from "express-validator";
 import express, { Request, Response } from "express";
 import { validateRequest } from "../middlewares/validate-request";
-import isValidCurrency from "../services/valid-currency";
+import { isValidCurrency } from "../services/valid-currency";
+import { requireAuth } from "../middlewares/require-auth";
 
 const router = express.Router();
 
 router.get(
-  "/rate",
+  "/rate/:from?/:to?",
+  requireAuth,
   [
-    body("from").not().isEmpty().withMessage("'from' parameter is required"),
-    body("from").custom(isValidCurrency),
-    body("to").not().isEmpty().withMessage("'to' parameter is required"),
-    body("to").custom(isValidCurrency),
+    param("from").not().isEmpty().withMessage("'from' parameter is required"),
+    param("to").not().isEmpty().withMessage("'to' parameter is required"),
+    param("to").custom(isValidCurrency),
+    param("from").custom(isValidCurrency),
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { from, to } = req.body;
+    const { from, to } = req.params;
 
-    const { rate } = await fetchRate(`${from}${to}`);
+    let rate = 0;
+    if (from !== to) {
+      const response = await fetchRate(`${from}${to}`);
+      rate = response.rate;
+    }
     res.send({ rate });
   }
 );
