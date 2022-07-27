@@ -6,10 +6,19 @@ import { getRateRouter } from "./routes/rate-handler";
 import { errorHandler } from "./middlewares/error-handlers";
 import { NotFoundError } from "./errors/not-found-error";
 import { registerRouter } from "./routes/register-handler";
+import cookieSession from "cookie-session";
 
 const app = express();
 
 app.use(json());
+
+app.use(
+  cookieSession({
+    signed: false,
+    // 30 days.
+    maxAge: 1000 * 60 * 60 * 24 * 30,
+  })
+);
 
 app.use(getCurrenciesRouter);
 app.use(getRateRouter);
