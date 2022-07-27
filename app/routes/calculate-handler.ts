@@ -1,13 +1,15 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { validateRequest } from "../middlewares/validate-request";
-import isValidCurrency from "../services/valid-currency";
+import { isValidCurrency } from "../services/valid-currency";
 import { calculateCurrencies } from "../services/calculate-currency";
+import { requireAuth } from "../middlewares/require-auth";
 
 const router = express.Router();
 
 router.post(
   "/calculate",
+  requireAuth,
   [
     body("from").not().isEmpty().withMessage("'from' parameter is required"),
     body("amount")
