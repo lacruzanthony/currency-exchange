@@ -1,28 +1,28 @@
 import { CustomValidator } from "express-validator";
 import { BadRequestError } from "../errors/bad-request-error";
-import { fetchCurrencies } from "./api-client";
+import { cacheWrapper } from "../cache-wrapper";
 
-const isValidCurrencie: CustomValidator = async (
+export const isValidCurrency: CustomValidator = async (
   value: string | undefined | string[]
 ) => {
-  const currencies = await fetchCurrencies();
+  const cache = cacheWrapper.client;
+  const currencies = cache.get("currencies") as string[];
+
   if (value === undefined) {
-    return Promise.resolve();
+    return;
   }
 
   if (Array.isArray(value)) {
     value.forEach((currency) => {
-      if (!currencies.includes(currency)) {
+      if (!currencies.includes(currency.toUpperCase())) {
         throw new BadRequestError(`Currency ${currency} is not supported`);
       }
     });
   } else {
-    if (!currencies.includes(value)) {
+    if (!currencies.includes(value.toUpperCase())) {
       throw new BadRequestError(`Currency ${value} is not supported`);
     }
   }
 
-  return Promise.resolve();
+  return;
 };
-
-export default isValidCurrencie;
