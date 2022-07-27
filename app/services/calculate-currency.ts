@@ -15,6 +15,8 @@ export const calculateCurrencies = async (
   const rates: number[] = [];
   const fetchets = [] as Array<Promise<RateResponse>>;
 
+  to = [...new Set(to)];
+
   to.forEach((currency: string) => {
     fetchets.push(fetchRate(`${from}${currency}`));
   });
