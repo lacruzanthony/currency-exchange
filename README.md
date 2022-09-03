@@ -1,10 +1,9 @@
-# An offline coding task for CHECK24 Accident Insurance
+# An offline coding task.
 
 ## Prerequisites
 
 Please make sure that:
 
-- You can clone this repository and create and push you branches to it
 - You can start the service (`npm start`)
 - All the tests pass (`npm test`)
 
