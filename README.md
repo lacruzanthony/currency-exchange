@@ -161,13 +161,3 @@ Response: `403`
 ```
 
 All existing endpoints should still work as expected, given a pair `userName / apiKey` is valid.
-
-## Additional notes (important!)
-
-- When working on the task, please feel free to refactor the existing code too. Current solution may contain questionable or incomplete code in several places. At the same time, follow task requirements provided here.
-
-- New functionality should be unit tested
-
-- You do not need to deploy this API anywhere, a working local version is sufficient
-
-- Please avoid extra pushes to your pull request once we notified you that we started the review process
