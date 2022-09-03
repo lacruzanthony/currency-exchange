@@ -150,7 +150,7 @@ Response: `401`
 }
 ```
 
-- When a given user exceeds 1000 requests (in total for all endpoints), return 403:
+- When a given user exceeds 1000 requests (in total for all endpoints), return 403 (TBD):
 
 Response: `403`
 
