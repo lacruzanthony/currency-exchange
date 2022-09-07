@@ -4,6 +4,7 @@
 
 Please make sure that:
 
+- Install the dependencies (`npm install`)
 - You can start the service (`npm start`)
 - All the tests pass (`npm test`)
 
