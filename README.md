@@ -1,4 +1,4 @@
-# An offline coding task.
+# Currency exchange.
 
 ## Prerequisites
 
